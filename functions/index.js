@@ -4,12 +4,12 @@ const googleAssistantRequest = 'google';
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-const DialogflowApp = require('actions-on-google').DialogflowApp;
+//const DialogflowApp = require('actions-on-google').DialogflowApp;
 
 admin.initializeApp(functions.config().firebase);
 var firestore = admin.firestore();
 
-var request = require('request');
+//var request = require('request');
 
 // // Create and Deploy Your First Cloud Functions
 // // https://firebase.google.com/docs/functions/write-firebase-functions
@@ -47,7 +47,7 @@ exports.webhook = functions.https.onRequest((request, response) => {
 // This use <request> npm package to proceed the http call (npm install request)
 // Http authentication and OAuth signing are available as described here (https://www.npmjs.com/package/request#table-of-contents)
 // Pay attention that only connection inside Google domain (like Vision, cloud Platform, Storage, Datastore, ...) are allowed for free plan
-function askApiInCloudFunction() {
+/*function askApiInCloudFunction() {
     //This api provide random text as json only for test purpose
     request('https://jsonplaceholder.typicode.com/posts', function(error, response, body) {
         //Log are available in Firebase Cloud Function page for this app
@@ -55,7 +55,7 @@ function askApiInCloudFunction() {
         console.log('statusCode: ', response && response.statusCode);
         console.log('body: ', body);
     });
-}
+}*/
 
 // GoogleAssistant has a different type of text processing
 // This method adapt the text to the receiving device
