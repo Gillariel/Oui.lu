@@ -27,7 +27,7 @@ exports.webhook = functions.https.onRequest((request, response) => {
     const actionHandlers = {
         'input.welcome': () => {
             text = "some Text";
-            sendFormattedResponse(deviceSource, text, response);
+            sendFormattedResponse(deviceSource, text, response); ;
         },
         'firestore.testAddData': () => {
             text = `Data saved (${params.Name})`;
