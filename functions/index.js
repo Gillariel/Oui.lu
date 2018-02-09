@@ -27,10 +27,10 @@ exports.webhook = functions.https.onRequest((request, response) => {
     const actionHandlers = {
         'input.welcome': () => {
             text = "some Text";
-            sendFormattedResponse(deviceSource, text, response);
+            //sendFormattedResponse(deviceSource, text, response);
         },
         'input.selection_trip': () => {
-            var prices = `Les prix sont : `;;
+            var prices = `Les prix sont : `;
             var trainsRef = firestore.collection('trains');
             var train = trainsRef.where('departure', '==', 'Bruxelles').where('arrival', '==', 'Paris').get()
                 .then(snapShot => {
