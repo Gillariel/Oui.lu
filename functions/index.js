@@ -21,18 +21,18 @@ var request = require('request');
 exports.webhook = functions.https.onRequest((request, response) => {
     let action = request.body.result.action;
     let deviceSource = (request.body.originalRequest) ? request.body.originalRequest.source : undefined;
+    let params = request.body.result.parameters;
     // Associate functions to each possible actions. Better performance than a simple switch
     const actionHandlers = {
         'input.welcome': () => {
-          sendFormattedResponse(deviceSource, "some text");
+          sendFormattedResponse(deviceSource, "some text", response);
         },
         'firestore.testAddData': () => {
-            console.log("Value from user: " + request.body.result.parameters);
-            let params = request.body.result.parameters;
+            console.log("Value from user: " + params);
             addSimpleData(params);
         }, 
         'firestore.testRetrieveData': () => {
-
+            retrieveSimpleData(deviceSource, response);
         },
         'outsideApi.test': () => {
 
@@ -54,7 +54,7 @@ exports.webhook = functions.https.onRequest((request, response) => {
 function addSimpleData(nameObject) {  
     var docRef = firestore.collection('someCollection').add(nameObject)
         .then(() => {
-            sendFormattedResponse(`Hello ${nameObject.Name}, We'd save you in our firestore database thanks to a cloud function !`);
+            sendFormattedResponse(`Hello ${nameObject.Name}, We'd save you in our firestore database thanks to a cloud function !`, null);
         }).catch((e => {
             console.log("Error firestore", e);
             sendFormattedResponse(`Error while saving your data into our database`);        
@@ -62,13 +62,13 @@ function addSimpleData(nameObject) {
     );
 }
 
-function retrieveSimpleData() {  
-    var docRef = firestore.collection('someCollection').get()
-        .then(() => {
-            sendFormattedResponse(`Hello ${nameObject.Name}, We'd save you in our firestore database thanks to a cloud function !`);
+function retrieveSimpleData(source, response) {  
+    var docRef = firestore.collection('someCollection').doc('VoBA6t5GxdIEA79Gjp0H').get()
+        .then(function(snap) {
+            sendFormattedResponse(source, `Hello ${snap.data().Name}, retrieve data`, response);
         }).catch((e => {
             console.log("Error firestore", e);
-            sendFormattedResponse(`Error while saving your data into our database`);        
+            sendFormattedResponse(source, `Error while saving your data into our database`, response);        
         })
     );
 }
@@ -93,10 +93,10 @@ function askApiInCloudFunction() {
 
 // GoogleAssistant has a different type of text processing
 // This method adapt the text to the receiving device
-function sendFormattedResponse(requestSource, text) {
+function sendFormattedResponse(requestSource, text, response) {
     (requestSource === googleAssistantRequest)
         ? sendGoogleResponse(text)
-        : sendResponse(text);
+        : sendResponse(text, response);
 }
 
 function sendGoogleResponse (responseToUser) {
@@ -118,7 +118,7 @@ function sendGoogleResponse (responseToUser) {
     }
 }
 
-function sendResponse(responseToUser) {
+function sendResponse(responseToUser, response) {
     if (typeof responseToUser === 'string') {
         let responseJson = {};
         responseJson.speech = responseToUser; // spoken response
