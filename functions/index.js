@@ -27,6 +27,21 @@ exports.webhook = functions.https.onRequest((request, response) => {
         'input.welcome': () => {
           sendFormattedResponse(deviceSource, "some text", response);
         },
+        'input.selection_trip': () => {
+            var prices = `Les prix sont : `;
+            var trainsRef = firestore.collection('trains');
+            var train = trainsRef.where('departure', '==', 'Bruxelles').where('arrival', '==', 'Paris').get()
+                .then(snapShot => {
+                    snapShot.forEach(doc => {
+                        console.log(doc.id, '=>', doc.data().price);
+                        prices.concat(`${doc.data().price} - `);
+                    });
+                    sendResponse(prices, response);
+                })
+                .catch(e => {
+                    sendResponse('Error while retrieving data from database', response);
+                })
+        },
         'firestore.testAddData': () => {
             console.log("Value from user: " + params);
             addSimpleData(params);
